@@ -1,3 +1,7 @@
+#WebStorm IDE files
+*.iml
+.idea
+
 # Logs
 logs
 *.log
@@ -56,4 +60,5 @@ typings/
 
 # dotenv environment variables file
 .env
+
 
