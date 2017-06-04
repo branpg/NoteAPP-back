@@ -5,11 +5,15 @@ exports.getAllNotes = function(req, res) {
   console.log('GET ALL NOTES');
   console.log(req.query);
   console.log(req.params);
-  Note.find(function(err, notes) {
+  let query = {owner: req.user};
+  Note.find(query)
+    .sort({ _id: -1 })
+    .exec(function(err, notes) {
     if(err) {
       res.send(500, err.message);
+    } else {
+      res.status(200).jsonp(notes);
     }
-    res.status(200).jsonp(notes);
   });
 };
 
@@ -17,13 +21,12 @@ exports.getNote = function(req, res) {
   console.log('GET NOTE');
   console.log(req.query);
   console.log(req.params);
-  Note.findById(req.params.id, function(err, tvshow) {
+  Note.findById(req.params.id)
+    .exec(function(err, note) {
     if(err) {
       return res.send(500, err.message);
     }
-
-    console.log('GET /note/' + req.params.id);
-    res.status(200).jsonp(tvshow);
+    res.status(200).jsonp(note);
   });
 };
 
@@ -40,6 +43,8 @@ exports.newNote = function(req, res) {
   if(req.body.list) {
     source.list = req.body.list;
   }
+
+  source.owner = req.user;
 
   let note = new Note(source);
 

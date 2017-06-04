@@ -8,14 +8,10 @@ let noteSchema = new Schema({
     description: {
       type: String
     },
-    list: [{
-      checked: {
-        type: Boolean
-      },
-      value: {
-        type: String
-      }
-    }]
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
   },
   {
     timestamps: true
