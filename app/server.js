@@ -12,6 +12,7 @@ app.use(cors());
 app.set('port', 3000);
 
 require('./models/note.model')(app, mongoose);
+require('./models/tag.model')(app, mongoose);
 require('./models/user.model')(app, mongoose);
 let noteCtrl = require('./controllers/note.controller');
 let authCtrl = require('./controllers/auth.controller');

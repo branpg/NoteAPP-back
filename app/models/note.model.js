@@ -8,9 +8,25 @@ let noteSchema = new Schema({
     description: {
       type: String
     },
+    list: [
+      {
+        checked: {
+          type: Boolean
+        },
+        value: {
+          type: String
+        }
+      }
+    ],
+    color: {
+      type: String
+    },
     owner: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User'
+    },
+    sticky: {
+      type: Boolean
     }
   },
   {

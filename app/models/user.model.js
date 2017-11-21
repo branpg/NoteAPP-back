@@ -4,11 +4,29 @@ let Schema = mongoose.Schema;
 let userSchema = new Schema({
   name: {
     type: String,
-    unique: true,
-    required: true
+    required : true
   },
   password: {
-    type: String
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required : true
+  },
+  opts: {
+    newElementAtEnd: {
+      type: Boolean,
+      default: true
+    },
+    moveCheckedToBottom: {
+      type: Boolean,
+      default: true
+    },
+    theme: {
+      type: Number,
+      default: 0
+    }
   }
 });
 
