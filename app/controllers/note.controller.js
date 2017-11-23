@@ -86,35 +86,31 @@ exports.updateNote = function (req, res) {
     if (req.body.color) {
       note.color = req.body.color;
     }
-
-    note.save(function (err) {
-      if (err) {
-        return res.status(500).send(err.message);
+    if (req.body.isList !== note.isList) {
+      note.isList = req.body.isList;
+      if (note.isList) {
+        let arrayLista = req.body.description.split(/\r?\n/);
+        note.list = [];
+        for (let i = 0; i < arrayLista.length; i++) {
+          note.list.push(
+            {
+              checked: false,
+              value: arrayLista[i]
+            });
+        }
+        note.description = '';
+      } else {
+        if (req.body.list.length) {
+          note.description = req.body.list[0].value;
+          for (let i = 1; i < req.body.list.length; i++) {
+            note.description += '\n';
+            note.description += req.body.list[i].value;
+            console.log('VALOR - '+ req.body.list[i].value);
+            console.log('LINAEA ' + i + ' - ' + note.description);
+          }
+          console.log('DESCRIPCION - ' + note.description);
+        }
       }
-      res.status(200).jsonp(note);
-    });
-  });
-};
-
-exports.noteToList = function (req, res) {
-  console.log('NOTE TO LIST');
-  console.log(req.params);
-  console.log(req.body);
-  Note.findById(req.params.id, function (err, note) {
-    if (req.body.title) {
-      note.title = req.body.title;
-    }
-    if (req.body.description) {
-      note.description = req.body.description;
-    }
-    if (req.body.list) {
-      note.list = req.body.list;
-    }
-    if (req.body.sticky !== null) {
-      note.sticky = req.body.sticky;
-    }
-    if (req.body.color) {
-      note.color = req.body.color;
     }
 
     note.save(function (err) {

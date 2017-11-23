@@ -25,6 +25,10 @@ let noteSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'User'
     },
+    isList: {
+      type: Boolean,
+      default: false
+    },
     sticky: {
       type: Boolean,
       default: false

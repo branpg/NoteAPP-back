@@ -60,7 +60,7 @@ exports.getUserToken = function (req, res) {
     } else {
       if (!user) {
         return res
-          .status(500)
+          .status(400)
           .send({message: 'El nombre de usuario y la contraseña que ingresaste no coinciden con nuestros registros. ' +
           'Por favor, revisa e inténtalo de nuevo.'});
       }else{
