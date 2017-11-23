@@ -26,7 +26,8 @@ let noteSchema = new Schema({
       ref: 'User'
     },
     sticky: {
-      type: Boolean
+      type: Boolean,
+      default: false
     }
   },
   {
