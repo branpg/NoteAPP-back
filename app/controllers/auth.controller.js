@@ -32,16 +32,16 @@ exports.signup = function (req, res) {
           }
         });
       }else{
-        let errors = {};
+        let error = '';
         if (userCheck.name === req.body.name) {
-          errors.user = 'El nombre de usuario esta en uso';
+          error = 'El nombre de usuario esta en uso';
         }
         if (userCheck.email === req.body.email){
-          errors.email = 'La dirección de correo electronico esta en uso';
+          error = 'La dirección de correo electronico esta en uso';
         }
         return res
           .status(400)
-          .send({'errors': errors});
+          .send({message: error});
       }
     }
   });
@@ -61,8 +61,8 @@ exports.getUserToken = function (req, res) {
       if (!user) {
         return res
           .status(400)
-          .send({message: 'El nombre de usuario y la contraseña que ingresaste no coinciden con nuestros registros. ' +
-          'Por favor, revisa e inténtalo de nuevo.'});
+          .send({message: 'El email y la contraseña que ingresó no coinciden con nuestros registros. ' +
+          'Por favor, revise e inténtelo de nuevo.'});
       }else{
         return res
           .status(200)

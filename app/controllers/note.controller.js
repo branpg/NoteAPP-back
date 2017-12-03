@@ -89,6 +89,9 @@ exports.updateNote = function (req, res) {
     if (req.body.isList !== note.isList) {
       note.isList = req.body.isList;
       if (note.isList) {
+        if (!req.body.description) {
+          req.body.description = '';
+        }
         let arrayLista = req.body.description.split(/\r?\n/);
         note.list = [];
         for (let i = 0; i < arrayLista.length; i++) {
