@@ -1,11 +1,14 @@
 let mongoose = require('mongoose');
 let Note = mongoose.model('Note');
+let Tag = mongoose.model('Tag');
+let Promise = require('bluebird');
 
 exports.getAllNotes = function (req, res) {
   console.log('GET ALL NOTES');
   console.log(req.query);
   console.log(req.params);
   let query = {owner: req.user};
+  let promiseTag = Promise.resolve();
   if (req.query.search) {
     query['$or'] = [
       {'title': {'$regex': '.*' + req.query.search + '.*', '$options': 'i'}},
@@ -16,15 +19,40 @@ exports.getAllNotes = function (req, res) {
   if (req.query.sticky) {
     query.sticky = req.query.sticky;
   }
-  Note.find(query)
-    .sort({_id: -1})
-    .exec(function (err, notes) {
-      if (err) {
-        res.send(500, err.message);
-      } else {
-        res.status(200).jsonp(notes);
-      }
+  if (req.query.color) {
+    query.color = req.query.color;
+  }
+  if (req.query.tag) {
+    promiseTag = new Promise(function (fulfill, reject) {
+      Tag.find({name: req.query.tag, user: req.user}, {}, {})
+        .exec(function (err, res) {
+          if (err) {
+            reject(err);
+          }
+          else {
+            fulfill(res[0]);
+          }
+        });
     });
+  }
+
+  promiseTag.then(function (tag) {
+      if (tag) {
+        query.tags = tag._id;
+      }
+      console.log(query);
+      Note.find(query)
+        .populate('tags')
+        .sort({_id: -1})
+        .exec(function (err, notes) {
+          if (err) {
+            res.send(500, err.message);
+          } else {
+            res.status(200).jsonp(notes);
+          }
+        });
+    }
+  );
 };
 
 exports.getNote = function (req, res) {
@@ -32,6 +60,7 @@ exports.getNote = function (req, res) {
   console.log(req.query);
   console.log(req.params);
   Note.findById(req.params.id)
+    .populate('tags')
     .exec(function (err, note) {
       if (err) {
         return res.send(500, err.message);
@@ -70,6 +99,7 @@ exports.updateNote = function (req, res) {
   console.log('UPDATE NOTE');
   console.log(req.params);
   console.log(req.body);
+  let arrayPromises = [];
   Note.findById(req.params.id, function (err, note) {
     if (req.body.title) {
       note.title = req.body.title;
@@ -108,19 +138,39 @@ exports.updateNote = function (req, res) {
           for (let i = 1; i < req.body.list.length; i++) {
             note.description += '\n';
             note.description += req.body.list[i].value;
-            console.log('VALOR - '+ req.body.list[i].value);
-            console.log('LINAEA ' + i + ' - ' + note.description);
           }
-          console.log('DESCRIPCION - ' + note.description);
         }
       }
     }
-
-    note.save(function (err) {
-      if (err) {
-        return res.status(500).send(err.message);
+    if (req.body.tags) {
+      for (let i = 0; i < req.body.tags.length; i++) {
+        let query = {name: req.body.tags[i].name};
+        arrayPromises.push(
+          new Promise(function (fulfill, reject) {
+            Tag.findOneAndUpdate(query, {name: req.body.tags[i].name, user: req.user}, {new: true, upsert: true})
+              .exec(function (err, res) {
+                if (err) {
+                  reject(err);
+                }
+                else {
+                  fulfill(res);
+                }
+              });
+          }));
       }
-      res.status(200).jsonp(note);
+    }
+
+    Promise.all(arrayPromises).then(function (arrayTags) {
+      note.tags = [];
+      for (let i = 0; i < arrayTags.length; i++) {
+        note.tags.push(arrayTags[i]._id);
+      }
+      note.save(function (err) {
+        if (err) {
+          return res.status(500).send(err.message);
+        }
+        res.status(200).jsonp(note);
+      });
     });
   });
 };

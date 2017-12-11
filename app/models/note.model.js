@@ -19,20 +19,25 @@ let noteSchema = new Schema({
       }
     ],
     color: {
-      type: String
+      type: String,
+      default: 'none'
     },
     owner: {
       type: Schema.Types.ObjectId,
       ref: 'User'
     },
+    sticky: {
+      type: Boolean,
+      default: false
+    },
     isList: {
       type: Boolean,
       default: false
     },
-    sticky: {
-      type: Boolean,
-      default: false
-    }
+    tags: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Tag'
+    }]
   },
   {
     timestamps: true

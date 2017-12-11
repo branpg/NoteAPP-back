@@ -16,6 +16,7 @@ require('./models/tag.model')(app, mongoose);
 require('./models/user.model')(app, mongoose);
 let noteCtrl = require('./controllers/note.controller');
 let authCtrl = require('./controllers/auth.controller');
+let tagCtrl = require('./controllers/tag.controller');
 
 let router = express.Router();
 
@@ -30,6 +31,9 @@ router.route('/note/:id', middleware.ensureAuthenticated)
 
 router.route('/signup')
   .post(authCtrl.signup);
+
+router.route('/tags')
+  .get(middleware.ensureAuthenticated, tagCtrl.getTags);
 
 router.route('/getUserToken')
   .post(authCtrl.getUserToken);
